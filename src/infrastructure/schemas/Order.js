@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
         default: "Pending",
     },
     createAt :{
-        type: Date,
+        type: Date,        
         default: Date.now,
     },
 });
