@@ -1,21 +1,18 @@
 import express from "express";
-import { 
-    createCategory, 
-    deleteCategory, 
-    getCategories, 
-    getCategory, 
-    updateCategory 
-} from "../application/category";
-import { asyncHandler } from "../utils";
+import {
+  createCategory,
+  deleteCategory,
+  updateCategory,
+  getCategories,
+  getCategory,
+} from "../Application/category";
 
-export const categoryRouter = express.Router()
+export const categoryRouter = express.Router();
 
+categoryRouter.route("/").get(getCategories).post(createCategory);
 categoryRouter
-.route('/')
-.get(asyncHandler(getCategories))
-.post(asyncHandler(createCategory))
-categoryRouter
-.route('/:id')
-.get(asyncHandler(getCategory))
-.patch(asyncHandler(updateCategory))
-.delete(asyncHandler(deleteCategory))
+  .route("/:id")
+  .get(getCategory)
+  .delete(deleteCategory)
+  .patch(updateCategory);
+  

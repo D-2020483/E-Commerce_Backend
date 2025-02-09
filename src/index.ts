@@ -1,39 +1,38 @@
-import express from 'express';
-import {productRouter} from './api/product'
-import globalErrorHandlingMiddleware from './api/middleware/global-error-handling-middleware';
-import { categoryRouter } from './api/category';
-import { connectDB } from './infrastructure/db';
-import { orderRouter } from './api/order';
-import cors from "cors";
+import express, { ErrorRequestHandler } from "express";
+import "dotenv/config";
+import { productRouter } from "./api/product";
+import { connectDB } from "./infrastructure/db";
+import globalErrorHandlingMiddleware from "./api/middleware/global-error-handling-middleware";
+import { categoryRouter } from "./api/category";
+import { orderRouter } from "./api/order";
+import { clerkMiddleware } from "@clerk/express";
+import cors from 'cors';
 
 
 const app = express();
-require('dotenv').config();
 
-app.use(express.json());// For parsing JSON requests*
-app.use(cors({ origin: "http://localhost:5173"}));
+app.use(cors({ 
+    origin: "http://localhost:5173" ,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']}));
+
+app.use(express.json()); // For parsing JSON requests
+app.use(clerkMiddleware({
+    publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.VITE_CLERK_SECRET_KEy,
+}));
 
 
-app.use((req, res, next) => {
-   console.log("Recieved a Request");
-   console.log(req.method, req.url);
-   next();
- });
+
+app.use("/api/products", productRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/orders", orderRouter);
 
 
-app.use('/api/products', productRouter);
-app.use('/api/categories', categoryRouter);
-app.use('/api/orders', orderRouter);
-app.use(globalErrorHandlingMiddleware as any);
 
-//app.get('/products', getProducts)
+app.use(globalErrorHandlingMiddleware);
 
-//app.post('/products', createProduct)
 
-//app.get('/products/:id', getProduct)
-
-//app.delete('/products/:id', deleteProduct)
-
-//app.patch('/products/:id', updateProduct)
 connectDB();
-app.listen(8000, () => console.log(`Server running on port ${8000}`));
+app.listen(3000, () => console.log(`Server running on port ${3000}`));

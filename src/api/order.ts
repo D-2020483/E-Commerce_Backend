@@ -1,8 +1,9 @@
 import express from "express";
-import { getOrdersByUser, placeOrder } from "../application/order";
-import { asyncHandler } from "../utils";
+import { createOrder, getOrder } from "../Application/order";
+import { isAuthenticated } from "./middleware/authentication-middleware";
 
-export const orderRouter = express.Router()
 
-//orderRouter.route('/').post(asyncHandler(placeOrder))
-//orderRouter.route('/:id').get(asyncHandler(getOrdersByUser))
+export const orderRouter = express.Router();
+
+orderRouter.route("/").post(createOrder);
+//orderRouter.route("/:id").get(getOrder);

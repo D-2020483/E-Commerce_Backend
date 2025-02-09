@@ -6,17 +6,16 @@ import {
     deleteProduct , 
     updateProduct
 } from "../Application/product"
-import { asyncHandler } from "../utils";
 
 
 export const productRouter = express.Router()
 
 productRouter
 .route('/')
-.get(asyncHandler(getProducts))
-.post(asyncHandler(createProduct))
+.get(getProducts)
+.post(createProduct)
 productRouter
 .route('/:id')
-.get(asyncHandler(getProduct))
-.delete(asyncHandler(deleteProduct))
-.patch(asyncHandler(updateProduct))
+.get(getProduct)
+.delete(deleteProduct)
+.patch(updateProduct)
