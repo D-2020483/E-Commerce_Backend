@@ -6,8 +6,7 @@ import { getAuth } from "@clerk/express";
 import NotFoundError from "../domain/errors/not-found-error";
 
 const orderSchema = z.object({
-  items: z
-    .object({
+  items: z.object({
       product: z.object({
         _id: z.string(),
         name: z.string(),
@@ -37,7 +36,7 @@ export const createOrder = async (
     const userId = getAuth(req).userId;
 
     await Order.create({
-      userId: "user_2rUT3YfIos3Loal9MUyWuqt974a",
+      userId: "123",
       items: result.data.items,
     });
 

@@ -6,8 +6,7 @@ export const isAuthenticated = (
     res: Response, 
     next:NextFunction
 ) => {
-    const auth = getAuth(req);
-    if(!auth || !auth.userId){
+    if(!getAuth(req).userId) {
         throw new Error("Not Authenticated");
     }
     next();

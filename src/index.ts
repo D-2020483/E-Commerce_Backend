@@ -7,6 +7,7 @@ import { categoryRouter } from "./api/category";
 import { orderRouter } from "./api/order";
 import { clerkMiddleware } from "@clerk/express";
 import cors from 'cors';
+import { paymentsRouter } from "./api/payment";
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(clerkMiddleware({
 app.use("/api/products", productRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/payments", paymentsRouter);
 
 
 
