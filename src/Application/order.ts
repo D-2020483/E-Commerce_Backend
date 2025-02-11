@@ -4,11 +4,13 @@ import ValidationError from "../domain/errors/validationError";
 import Order from "../infrastructure/schemas/Order";
 import { getAuth } from "@clerk/express";
 import NotFoundError from "../domain/errors/not-found-error";
+import mongoose from "mongoose";
 
 const orderSchema = z.object({
-  items: z.object({
+  items: z.array(
+    z.object({
       product: z.object({
-        _id: z.string(),
+        _id: z.string(), 
         name: z.string(),
         price: z.string(),
         image: z.string(),
@@ -16,7 +18,7 @@ const orderSchema = z.object({
       }),
       quantity: z.number(),
     })
-    .array(),
+  ),
 });
 
 export const createOrder = async (
@@ -28,19 +30,29 @@ export const createOrder = async (
     const order = req.body;
     // console.log(order);
     const result = orderSchema.safeParse(order);
+
     if (!result.success) {
-      console.log(result.error);
       throw new ValidationError("Invalid order data");
     }
-
+    
+    const items = result.data.items.map(item => ({
+      ...item,
+      product: {
+        ...item.product,
+        _id: mongoose.Types.ObjectId.isValid(item.product._id)
+          ? new mongoose.Types.ObjectId(item.product._id)
+          : item.product._id, 
+      }
+    }));
+    
     const userId = getAuth(req).userId;
 
-    await Order.create({
+    const newOrder = await Order.create({
       userId: "123",
-      items: result.data.items,
+      items: items,
     });
 
-    res.status(201).send();
+    res.status(201).json(newOrder);
   } catch (error) {
     next(error);
   }
