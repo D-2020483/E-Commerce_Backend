@@ -10,7 +10,7 @@ export const handleWebhook = async (
 
   if (type === "succeeded") {
     await Order.findByIdAndUpdate(data.orderId, { paymentStatus: "PAID" });
-    res.status(200).send();
-    return
   }
+  res.status(200).send();
+  return;
 };

@@ -5,6 +5,7 @@ import Order from "../infrastructure/schemas/Order";
 import { getAuth } from "@clerk/express";
 import NotFoundError from "../domain/errors/not-found-error";
 import mongoose from "mongoose";
+import Address from "../infrastructure/schemas/Address";
 
 const orderSchema = z.object({
   items: z.array(
@@ -17,8 +18,16 @@ const orderSchema = z.object({
         description: z.string(),
       }),
       quantity: z.number(),
-    })
+    }),
   ),
+  shippingAddress: z.object({
+    line_1: z.string().min(1, "Address line 1 is required"),
+    line_2: z.string().min(1, "Address line 2 is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State/Province is required"),
+    zip_code: z.string().min(1, "Zip Code is required"),
+    phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"),
+  }),
 });
 
 export const createOrder = async (
@@ -28,31 +37,25 @@ export const createOrder = async (
 ) => {
   try {
     const order = req.body;
-    // console.log(order);
+    console.log(order);
     const result = orderSchema.safeParse(order);
 
     if (!result.success) {
+      console.log(result.error);
       throw new ValidationError("Invalid order data");
     }
     
-    const items = result.data.items.map(item => ({
-      ...item,
-      product: {
-        ...item.product,
-        _id: mongoose.Types.ObjectId.isValid(item.product._id)
-          ? new mongoose.Types.ObjectId(item.product._id)
-          : item.product._id, 
-      }
-    }));
-    
     const userId = getAuth(req).userId;
-
-    const newOrder = await Order.create({
-      userId: "123",
-      items: items,
+    const addressId = await Address.create({
+      ...result.data.shippingAddress,
     });
 
-    res.status(201).json(newOrder);
+    await Order.create({
+      userId: "user_2ssdkR3frHTMU1SRkCIQqVns8eI",
+      items: result.data.items,
+      addressId: addressId._id,
+    });
+    res.status(201).send();
   } catch (error) {
     next(error);
   }
@@ -65,7 +68,10 @@ export const getOrder = async (
 ) => {
   try {
     const id = req.params.id;
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate({
+      path: "addressId",
+      model: "Address",
+    });
     if (!order) {
       throw new NotFoundError("Order not found");
     }

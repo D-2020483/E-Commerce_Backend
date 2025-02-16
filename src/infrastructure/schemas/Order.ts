@@ -15,6 +15,7 @@ const ItemSchema = new mongoose.Schema({
 
 const OrderSchema = new mongoose.Schema({
   userId: { type: String, required: true },
+  addressId: { type: String, required: true },
   items: {
     type: [ItemSchema],
     required: true,
