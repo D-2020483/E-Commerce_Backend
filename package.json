@@ -1,6 +1,7 @@
 {
     "scripts": {
         "dev": "nodemon src/index.ts",
+        "build": "npm install",
         "start": "ts-node src/index.ts"
     },
     "dependencies": {
