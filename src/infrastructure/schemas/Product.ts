@@ -1,39 +1,31 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
-const VariantSchema = new mongoose.Schema({
-  name: { type: String, required: true }, 
-  stock: { type: Number, required: true, default: 0 },
+interface Variant {
+  name: string;
+  stock: number;
+}
+
+interface ProductDocument extends Document {
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  categoryId: mongoose.Schema.Types.ObjectId;
+  variants: Variant[]; 
+}
+
+const VariantSchema = new Schema<Variant>({
+  name: { type: String, required: true },
+  stock: { type: Number, required: true },
 });
 
-const ProductSchema = new mongoose.Schema({
-  categoryId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    required: true,
-  },
-  image: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  variants: [
-    {
-      name: { type: String, required: true },
-      stock: { type: Number, required: true },
-    }
-  ], 
-  
+const ProductSchema = new Schema<ProductDocument>({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  image: { type: String, required: true },
+  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  variants: [VariantSchema], 
 });
 
-export default mongoose.model("Product", ProductSchema);
+export default mongoose.model<ProductDocument>('Product', ProductSchema);
