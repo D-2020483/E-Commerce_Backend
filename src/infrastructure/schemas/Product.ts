@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+const VariantSchema = new mongoose.Schema({
+  name: { type: String, required: true }, 
+  stock: { type: Number, required: true, default: 0 },
+});
+
 const ProductSchema = new mongoose.Schema({
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -22,10 +27,12 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  stock: {
-    type: Number,
-    required: true,
-    default: 0 },      
+  variants: [
+    {
+      name: { type: String, required: true },
+      stock: { type: Number, required: true },
+    }
+  ], 
   
 });
 

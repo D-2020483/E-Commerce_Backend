@@ -23,19 +23,23 @@ export const getProducts = async (
     next(error);
   }
 };
-
 export const createProduct = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-
-    const { name, price, description, image, categoryId, stock } = req.body;
+    const { name, price, description, image, categoryId, variants } = req.body;
 
     // Validate required fields
-    if (!name || !price || !description || !image || !categoryId || stock === undefined) {
+    if (!name || !price || !description || !image || !categoryId || !variants) {
       res.status(400).json({ message: "All fields are required" });
+      return;
+    }
+
+    // Validate variants
+    if (!Array.isArray(variants) || variants.length === 0) {
+      res.status(400).json({ message: "At least one variant is required" });
       return;
     }
 
@@ -119,14 +123,24 @@ export const checkoutProduct = async (
         throw new NotFoundError("Product not found");
       }
 
-      if (product.stock < item.quantity) {
+      // Find the variant
+      const variant = product.variants.find((v) => v.name === item.variantName);
+      if (!variant) {
         res.status(400).json({
-          message: `Not enough stock for product: ${product.name}`,
+          message: `Variant ${item.variantName} not found for product: ${product.name}`,
         });
         return;
       }
 
-      product.stock -= item.quantity;
+      if (variant.stock < item.quantity) {
+        res.status(400).json({
+          message: `Not enough stock for variant ${item.variantName} of product: ${product.name}`,
+        });
+        return;
+      }
+
+      // Reduce stock for the variant
+      variant.stock -= item.quantity;
       await product.save();
     }
 
