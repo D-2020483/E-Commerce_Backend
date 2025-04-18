@@ -17,8 +17,8 @@ const ItemSchema = new mongoose.Schema({
 
 
 const OrderSchema = new mongoose.Schema({
-  userId: { type: String, required: true }, 
-  addressId: { type: String, required: true }, 
+  userId: { type: String, required: true },
+  addressId: { type: String, required: true },
   items: {
     type: [ItemSchema],
     required: true,
@@ -38,7 +38,6 @@ const OrderSchema = new mongoose.Schema({
 }, {
   timestamps: true, 
 });
-
 
 const Order = mongoose.model("Order", OrderSchema);
 
