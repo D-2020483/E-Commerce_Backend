@@ -6,8 +6,14 @@ export const isAuthenticated = (
     res: Response, 
     next:NextFunction
 ) => {
-    if(!getAuth(req).userId) {
-        throw new Error("Not Authenticated");
+    try {
+        const  auth = getAuth(req);
+        if (!auth.userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        next();
+
+    } catch (error) {
+        return res.status(401).json({ message: "Unauthorized" });
     }
-    next();
 };
