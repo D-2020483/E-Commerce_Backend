@@ -15,6 +15,7 @@ productRouter
 .route('/')
 .get(getProducts)
 .post(createProduct)
+
 productRouter
 .route('/:id')
 .get(getProduct)

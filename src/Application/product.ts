@@ -30,6 +30,15 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   try {
+
+    const { name, price, description, image, categoryId, stock } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !description || !image || !categoryId || stock === undefined) {
+      res.status(400).json({ message: "All fields are required" });
+      return;
+    }
+
     await Product.create(req.body);
     res.status(201).send();
     return;
