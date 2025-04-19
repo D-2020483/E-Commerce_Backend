@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import ValidationError from "../domain/errors/validationError";
 import Order from "../infrastructure/schemas/Order";
+import Product from "../infrastructure/schemas/Product";
 import { getAuth } from "@clerk/express";
 import NotFoundError from "../domain/errors/not-found-error";
 import mongoose from "mongoose";
@@ -43,6 +44,24 @@ export const createOrder = async (
     if (!result.success) {
       console.log("Validation error:", result.error);
       throw new ValidationError("Invalid order data");
+    }
+
+    // Validate stock levels for all items
+    for (const item of result.data.items) {
+      const product = await Product.findById(item.product._id);
+      if (!product) {
+        throw new NotFoundError(`Product not found: ${item.product._id}`);
+      }
+
+      // Get the default variant or first variant
+      const variant = product.variants.find(v => v.name === 'default') || product.variants[0];
+      if (!variant) {
+        throw new ValidationError(`No variants found for product: ${product.name}`);
+      }
+
+      if (variant.stock < item.quantity) {
+        throw new ValidationError(`Insufficient stock for ${product.name}. Available: ${variant.stock}, Requested: ${item.quantity}`);
+      }
     }
     
     const userId = getAuth(req).userId;
