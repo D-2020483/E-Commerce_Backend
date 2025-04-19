@@ -17,6 +17,10 @@ const orderSchema = z.object({
         price: z.string(),
         image: z.string(),
         description: z.string(),
+        variant: z.object({
+          name: z.string(),
+          stockAtPurchase: z.number()
+        })
       }),
       quantity: z.number(),
     }),
@@ -62,6 +66,12 @@ export const createOrder = async (
       if (variant.stock < item.quantity) {
         throw new ValidationError(`Insufficient stock for ${product.name}. Available: ${variant.stock}, Requested: ${item.quantity}`);
       }
+
+      // Add variant information to the order item
+      item.product.variant = {
+        name: variant.name,
+        stockAtPurchase: variant.stock
+      };
     }
     
     const userId = getAuth(req).userId;
