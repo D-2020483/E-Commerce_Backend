@@ -15,7 +15,7 @@ const app = express();
 app.use(cors({ 
     origin: "https://fed-storefront-frontend-dinithi.netlify.app" ,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST','PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']}));
 
 app.use(express.json()); // For parsing JSON requests
