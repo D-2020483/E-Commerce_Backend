@@ -37,11 +37,11 @@ export const createOrder = async (
 ) => {
   try {
     const order = req.body;
-    console.log(order);
+    console.log("Received order data:", order);
     const result = orderSchema.safeParse(order);
 
     if (!result.success) {
-      console.log(result.error);
+      console.log("Validation error:", result.error);
       throw new ValidationError("Invalid order data");
     }
     
@@ -50,13 +50,21 @@ export const createOrder = async (
       ...result.data.shippingAddress,
     });
 
-    await Order.create({
-      userId: "user_2ssdkR3frHTMU1SRkCIQqVns8eI",
+    const createdOrder = await Order.create({
+      userId: userId || "user_2ssdkR3frHTMU1SRkCIQqVns8eI",
       items: result.data.items,
       addressId: addressId._id,
     });
-    res.status(201).send();
+
+    // Populate the address details
+    const populatedOrder = await Order.findById(createdOrder._id).populate({
+      path: "addressId",
+      model: "Address",
+    });
+
+    res.status(201).json(populatedOrder);
   } catch (error) {
+    console.error("Order creation error:", error);
     next(error);
   }
 };
