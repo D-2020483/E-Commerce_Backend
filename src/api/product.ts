@@ -6,6 +6,7 @@ import {
     deleteProduct , 
     updateProduct,
     checkoutProduct,
+    updateProductStock,
 } from "../Application/product"
 
 
@@ -23,3 +24,6 @@ productRouter
 .patch(updateProduct)
 
 productRouter.route("/checkout").post(checkoutProduct)
+
+// Add new route for updating stock
+productRouter.route("/:productId/stock").put(updateProductStock)
